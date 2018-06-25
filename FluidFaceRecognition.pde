@@ -14,6 +14,9 @@ PGraphics2D pg_fluid;
 Capture cam; 
 OpenCV opencv;
 
+float xPos = 0.0;
+float yPos = 0.0;
+
 void setup() 
 { 
 
@@ -33,6 +36,8 @@ void setup()
   // some fluid parameters
   fluid.param.dissipation_velocity = 0.70f;
   fluid.param.dissipation_density  = 0.99f;
+  
+  frameRate(1000);
 
 }
 
@@ -53,14 +58,8 @@ void draw() {
   opencv.loadImage(cam); 
   Rectangle[] faces = opencv.detect();
 
-  noFill(); 
-  stroke(0, 255, 0); 
-  strokeWeight(3); 
-
   float x = 0.0;
   float y = 0.0;
-  float xPos = 0.0;
-  float yPos = 0.0;
 
   for (int i = 0; i < faces.length; i++) 
   {
@@ -69,22 +68,19 @@ void draw() {
     y = faces[i].y;
     xPos = x + ( faces[i].width / 2.0 );
     yPos = y + ( faces[i].height / 2.0 );
-    rect(x, y, faces[i].width, faces[i].height);
 
   }
   
   // adding data to the fluid simulation
   fluid.addCallback_FluiData(new  DwFluid2D.FluidData() {
     public void update(DwFluid2D fluid) {
-      if (mousePressed) {
-        float px     = mouseX;
-        float py     = height-mouseY;
-        float vx     = (mouseX - pmouseX) * +15;
-        float vy     = (mouseY - pmouseY) * -15;
-        fluid.addVelocity(px, py, 14, vx, vy);
-        fluid.addDensity (px, py, 20, 0.0f, 0.4f, 1.0f, 1.0f);
-        fluid.addDensity (px, py, 8, 1.0f, 1.0f, 1.0f, 1.0f);
-      }
+      float px     = xPos;
+      float py     = height-yPos;
+      float vx     = (xPos) * +15;
+      float vy     = (yPos) * -15;
+      fluid.addVelocity(px, py, 14, vx, vy);
+      fluid.addDensity (px, py, 20, 0.0f, 0.4f, 1.0f, 1.0f);
+      fluid.addDensity (px, py, 8, 1.0f, 1.0f, 1.0f, 1.0f);
     }
   });
 
@@ -103,5 +99,7 @@ void draw() {
 
   // display
   image(pg_fluid, 0, 0);
+  
+  println(frameRate);
   
 }
